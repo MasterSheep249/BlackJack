@@ -207,45 +207,110 @@ bool bust(int aInt)
 }
 bool playBlackJack(Deck& aDeck)
 {
-	Card dealerCard = aDeck[0];
-	Card playerCardOne = aDeck[1];
-	Card playerCardTwo = aDeck[2];
+	//Card dealerCard = aDeck[0];
+	//Card playerCardOne = aDeck[1];
+	//Card playerCardTwo = aDeck[2];
 	Rank randomPlayerRank{};
 	Rank randomDealerRank{};
 
-	int playerScore{ getRank(aDeck[1].rank) + getRank(aDeck[2].rank)};
-	int dealerScore{ 0 };
+	int playerScore{ getRank(aDeck[0].rank) + getRank(aDeck[1].rank)};
+	int dealerScore{ getRank(aDeck[2].rank)};
 
-	int playerCardIndex{ 2 };
+	int playerCardIndex{ 1 };
 	int dealerCardIndex{ 0 };
+
+	std::cout << "Player starting with score of " << playerScore << '\n';
+	std::cout << "Dealer starting with score of " << dealerScore << '\n';
+	std::cout << '\n';
+
 
 	while (true)
 	{
-		std::cout << "Hit or Stand? ";
-		std::string choice{};
-		std::cin >> choice;
-		if (equalsIgnoreCase(choice, "hit"))
+		while (true)
 		{
-			randomPlayerRank = aDeck[playerCardIndex + 1].rank;
-			++playerCardIndex;
-			playerScore += getRank(randomPlayerRank);
-			std::cout << playerScore;
-			if (bust(playerScore))
+			std::cout << "Hit or Stand? ";
+			std::string choice{};
+			std::cin >> choice;
+			if (equalsIgnoreCase(choice, "hit"))
 			{
-				std::cout << "You lost :/";
+				randomPlayerRank = aDeck[playerCardIndex + 1].rank;
+				std::cout << "HIT..." << '\n';
+				std::cout << '\n';
+				std::cout << "You drew a card with rank " << getRank(randomPlayerRank) << '\n';
+				std::cout << '\n';
+				++playerCardIndex;
+				playerScore += getRank(randomPlayerRank);
+				if (bust(playerScore))
+				{
+					std::cout << "You went over the score of 21 with a score of " << playerScore << '\n';
+					return false;
+				}
+			}
+			else if (equalsIgnoreCase(choice, "stand"))
+			{
+				std::cout << "Turn over. Your score is " << playerScore << '\n';
+				std::cout << '\n';
+				std::cout << "Starting dealer turn..." << '\n';
+				std::cout << '\n';
+				break;
 			}
 		}
+		
 
+		std::cout << "Dealer begins drawing cards... " << '\n';
+		std::cout << '\n';
+		while (true)
+		{
+			if (dealerCardIndex <= playerCardIndex)
+			{
+				dealerCardIndex = playerCardIndex + 2;
+			}
+
+			randomDealerRank = aDeck[dealerCardIndex].rank;
+			dealerScore += getRank(randomDealerRank);
+			std::cout << "Dealer drew card with rank " << getRank(randomDealerRank) << '\n';
+			std::cout << '\n';
+			std::cout << "Dealer's score is " << dealerScore << "\n\n";
+
+			if (dealerScore > 17 && dealerScore <= 21)
+			{
+				std::cout << "The dealer's final score was " << dealerScore << '\n';
+				std::cout << '\n';
+				break;
+			}
+
+			if (dealerScore > 21)
+			{
+				std::cout << "The dealer busts with a score of " << dealerScore << "! You win";
+				return true;
+			}
+			++dealerCardIndex;
+		}
+
+		if (playerScore > dealerScore)
+		{
+			std::cout << "The player won with a score of " << playerScore << " and the dealer's score was " << dealerScore;
+			return true;
+		}
+		if (playerScore < dealerScore)
+		{
+			std::cout << "The dealer won with a score of " << dealerScore << " and the player's score was " << playerScore;
+			return false;
+		}
+		else
+		{
+			std::cout << "TIE SCORE: The dealer won with a score of " << dealerScore << " and the player's score was " << playerScore;
+			return false;
+		}
 		
 	}
+	return true;
 }
 int main()
 {
-	//printDeck(createDeck());
+	
 	Deck aDeck = createDeck();
 	shuffleDeck(aDeck);
-	//printDeck(aDeck);
-
 	playBlackJack(aDeck);
 
 }
